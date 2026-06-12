@@ -19,9 +19,31 @@
   label{font-size:13px;color:var(--muted)}input,textarea,select{width:100%;margin-top:5px;padding:11px;border-radius:8px;border:1px solid #444;background:#050505;color:white;font-size:15px}textarea{resize:vertical;min-height:42px}
   .buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;justify-content:center}button{border:0;border-radius:9px;padding:11px 15px;font-weight:bold;cursor:pointer;color:#000;background:var(--green)}button.sec{background:var(--blue)}button.warn{background:var(--gold)}button.danger{background:var(--red);color:white}
   .tableBox{overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}table{width:100%;border-collapse:collapse;min-width:850px}th,td{border:1px solid #3a3a3a;padding:9px;text-align:center}th{background:#222;color:var(--green);position:sticky;top:0}td input,td textarea,td select{margin:0;padding:8px;font-size:14px}.right{text-align:right}.footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}.remove{background:var(--red);color:white;padding:7px 10px}
-  .history{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}.history h2{color:var(--blue);margin:0 0 10px;text-align:center}.histItem{border:1px solid #333;border-radius:9px;padding:10px;margin:8px 0;background:#0d0d0d}.histItem b{color:var(--green)}
-  @media(max-width:800px){.top{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}h1{font-size:22px}body{padding:8px}.value{font-size:19px}button{width:100%}}
-  @media print{body{background:white;color:black}.form,.buttons,.footer,.remove{display:none!important}.box,.tableBox,.history{border:1px solid #000;background:white;color:black;box-shadow:none}h1,.value,th,.history h2{color:black}th{background:#ddd}.top{grid-template-columns:repeat(4,1fr)}textarea,input,select{border:0;background:white;color:black}.wrap{max-width:none}}
+  .history,.resumoCat{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}.history h2,.resumoCat h2{color:var(--blue);margin:0 0 10px;text-align:center}.histItem{border:1px solid #333;border-radius:9px;padding:10px;margin:8px 0;background:#0d0d0d}.histItem b{color:var(--green)} .cardsCat{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.catCard{border:1px solid #333;border-radius:10px;padding:10px;background:#0d0d0d;text-align:center}.catCard b{color:var(--green);display:block;margin-bottom:6px}
+  @media(max-width:800px){
+  .top{grid-template-columns:1fr 1fr}
+  .grid{grid-template-columns:1fr}
+  h1{font-size:22px}
+  body{padding:8px}
+  .value{font-size:19px}
+  button{width:100%;font-size:16px;padding:14px}
+  input,textarea,select{font-size:16px;padding:13px}
+  .tableBox{overflow:visible;padding:0;background:transparent;border:0}
+  table{min-width:0;width:100%;border:0}
+  thead{display:none}
+  tr{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;margin:12px 0;padding:10px}
+  td{display:block;border:0;text-align:left;padding:7px}
+  td::before{display:block;color:var(--green);font-weight:bold;margin-bottom:4px}
+  td:nth-child(1)::before{content:'Data'}
+  td:nth-child(2)::before{content:'Comprado'}
+  td:nth-child(3)::before{content:'Categoria'}
+  td:nth-child(4)::before{content:'Descrição'}
+  td:nth-child(5)::before{content:'Pagamento'}
+  td:nth-child(6)::before{content:'Valor R$'}
+  td:nth-child(7)::before{content:'Ação'}
+  .remove{width:100%}
+}
+  @media print{body{background:white;color:black}.form,.buttons,.footer,.remove{display:none!important}.box,.tableBox,.history,.resumoCat{border:1px solid #000;background:white;color:black;box-shadow:none}h1,.value,th,.history h2{color:black}th{background:#ddd}.top{grid-template-columns:repeat(4,1fr)}textarea,input,select{border:0;background:white;color:black}.wrap{max-width:none}}
 </style>
 </head>
 <body>
@@ -40,7 +62,7 @@
     <div class="grid">
       <div><label>Data da compra</label><input id="dataCompra" type="date"></div>
       <div><label>O que foi comprado</label><input id="itemCompra" placeholder="Ex: maquiagem, tecido, alimento..."></div>
-      <div><label>Categoria</label><select id="categoria"><option>Geral</option><option>Figurino</option><option>Maquiagem</option><option>Transporte</option><option>Alimentação</option><option>Show</option><option>Casa</option><option>Outro</option></select></div>
+      <div><label>Categoria</label><select id="categoria"><option>Geral</option><option>Figurino</option><option>Maquiagem</option><option>Transporte</option><option>Alimentação</option><option>Show</option><option>Casa</option><option>🐱 Ração de gato</option><option>🐾 Areia granulada</option><option>🧴 Higiene Pet</option><option>💊 Saúde Pet</option><option>🎾 Acessórios Pet</option><option>Outro</option></select></div>
       <div><label>Valor R$</label><input id="valorCompra" type="number" step="0.01" min="0" placeholder="0,00"></div>
       <div><label>Forma de pagamento</label><select id="pagamento"><option>Dinheiro</option><option>Pix</option><option>Débito</option><option>Crédito</option><option>Boleto</option><option>Outro</option></select></div>
     </div>
@@ -61,6 +83,11 @@
       </thead>
       <tbody id="corpoTabela"></tbody>
     </table>
+  </div>
+
+  <div class="resumoCat">
+    <h2>🐱 Resumo por categoria</h2>
+    <div id="resumoCategorias" class="cardsCat"></div>
   </div>
 
   <div class="history">
@@ -105,7 +132,7 @@ function renderizar(scroll=true){
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><input type="date" value="${g.data}" onchange="editar(${i},'data',this.value)"></td>
     <td><input value="${g.item.replaceAll('"','&quot;')}" onchange="editar(${i},'item',this.value)"></td>
-    <td><input value="${g.categoria.replaceAll('"','&quot;')}" onchange="editar(${i},'categoria',this.value)"></td>
+    <td><select onchange="editar(${i},'categoria',this.value)">${['Geral','Figurino','Maquiagem','Transporte','Alimentação','Show','Casa','🐱 Ração de gato','🐾 Areia granulada','🧴 Higiene Pet','💊 Saúde Pet','🎾 Acessórios Pet','Outro'].map(c=>`<option ${g.categoria===c?'selected':''}>${c}</option>`).join('')}</select></td>
     <td><textarea onchange="editar(${i},'descricao',this.value)">${g.descricao||''}</textarea></td>
     <td><input value="${g.pagamento.replaceAll('"','&quot;')}" onchange="editar(${i},'pagamento',this.value)"></td>
     <td><input type="number" step="0.01" value="${g.valor}" onchange="editar(${i},'valor',this.value)"></td>
@@ -115,12 +142,28 @@ function renderizar(scroll=true){
   const total = gastos.reduce((s,g)=>s+Number(g.valor||0),0);
   document.getElementById('totalMes').textContent = dinheiro(total);
   document.getElementById('qtdCompras').textContent = gastos.length;
+  renderResumoCategorias();
   renderHistorico();
 }
 function salvarHistorico(){
   const total = gastos.reduce((s,g)=>s+Number(g.valor||0),0);
   historico.unshift({data:new Date().toLocaleString('pt-BR'), total, qtd:gastos.length, compras:[...gastos]});
   salvarLocal(); renderHistorico(); alert('Histórico salvo com sucesso!');
+}
+
+function renderResumoCategorias(){
+  const div = document.getElementById('resumoCategorias');
+  const totais = {};
+  gastos.forEach(g => {
+    const cat = g.categoria || 'Geral';
+    totais[cat] = (totais[cat] || 0) + Number(g.valor || 0);
+  });
+  const categoriasFixas = ['🐱 Ração de gato','🐾 Areia granulada','🧴 Higiene Pet','💊 Saúde Pet','🎾 Acessórios Pet'];
+  categoriasFixas.forEach(cat => { if(!(cat in totais)) totais[cat] = 0; });
+  const totalPet = categoriasFixas.reduce((s,cat)=>s + Number(totais[cat] || 0), 0);
+  let html = Object.keys(totais).map(cat => `<div class="catCard"><b>${cat}</b><span>${dinheiro(totais[cat])}</span></div>`).join('');
+  html += `<div class="catCard"><b>🐱 Total Pet</b><span>${dinheiro(totalPet)}</span></div>`;
+  div.innerHTML = html;
 }
 function renderHistorico(){
   const div=document.getElementById('historico'); div.innerHTML='';
@@ -135,8 +178,5 @@ function gerarPDF(){ window.print(); }
 function limparTudo(){ if(confirm('Deseja apagar todos os gastos e histórico?')){ gastos=[]; historico=[]; salvarLocal(); renderizar(); } }
 renderizar();
 </script>
-<hr>
-
-<a href="index01.html"><h2>Proxima pagina.</h2></a>
 </body>
 </html>
