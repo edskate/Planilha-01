@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Planilha de Gastos do Mês</title>
+<style>
+  :root{--bg:#080808;--card:#151515;--line:#333;--text:#fff;--muted:#bdbdbd;--green:#00ff7f;--blue:#00b7ff;--red:#ff4b4b;--gold:#ffd166;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);padding:14px}
+  .wrap{max-width:1200px;margin:auto}
+  h1{text-align:center;color:var(--green);margin:10px 0 6px;font-size:26px}
+  .sub{text-align:center;color:var(--muted);margin-bottom:15px}
+  .top{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;box-shadow:0 0 12px #000}
+  .label{color:var(--muted);font-size:13px}.value{font-size:22px;font-weight:bold;color:var(--green);margin-top:5px}.clock{color:var(--blue)}.total{color:var(--gold)}
+  .form{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:1fr 1.4fr 1fr 1fr 1fr;gap:10px}
+  label{font-size:13px;color:var(--muted)}input,textarea,select{width:100%;margin-top:5px;padding:11px;border-radius:8px;border:1px solid #444;background:#050505;color:white;font-size:15px}textarea{resize:vertical;min-height:42px}
+  .buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;justify-content:center}button{border:0;border-radius:9px;padding:11px 15px;font-weight:bold;cursor:pointer;color:#000;background:var(--green)}button.sec{background:var(--blue)}button.warn{background:var(--gold)}button.danger{background:var(--red);color:white}
+  .tableBox{overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}table{width:100%;border-collapse:collapse;min-width:850px}th,td{border:1px solid #3a3a3a;padding:9px;text-align:center}th{background:#222;color:var(--green);position:sticky;top:0}td input,td textarea,td select{margin:0;padding:8px;font-size:14px}.right{text-align:right}.footer{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}.remove{background:var(--red);color:white;padding:7px 10px}
+  .history{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}.history h2{color:var(--blue);margin:0 0 10px;text-align:center}.histItem{border:1px solid #333;border-radius:9px;padding:10px;margin:8px 0;background:#0d0d0d}.histItem b{color:var(--green)}
+  @media(max-width:800px){.top{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}h1{font-size:22px}body{padding:8px}.value{font-size:19px}button{width:100%}}
+  @media print{body{background:white;color:black}.form,.buttons,.footer,.remove{display:none!important}.box,.tableBox,.history{border:1px solid #000;background:white;color:black;box-shadow:none}h1,.value,th,.history h2{color:black}th{background:#ddd}.top{grid-template-columns:repeat(4,1fr)}textarea,input,select{border:0;background:white;color:black}.wrap{max-width:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📒 Planilha de Gastos do Mês</h1>
+  <div class="sub">Controle de compras com data em tempo real, edição manual, histórico salvo e PDF.</div>
+
+  <div class="top">
+    <div class="box"><div class="label">Relógio digital</div><div id="relogio" class="value clock">--:--:--</div></div>
+    <div class="box"><div class="label">Data de hoje</div><div id="dataHoje" class="value">--/--/----</div></div>
+    <div class="box"><div class="label">Total do mês</div><div id="totalMes" class="value total">R$ 0,00</div></div>
+    <div class="box"><div class="label">Quantidade de compras</div><div id="qtdCompras" class="value">0</div></div>
+  </div>
+
+  <div class="form">
+    <div class="grid">
+      <div><label>Data da compra</label><input id="dataCompra" type="date"></div>
+      <div><label>O que foi comprado</label><input id="itemCompra" placeholder="Ex: maquiagem, tecido, alimento..."></div>
+      <div><label>Categoria</label><select id="categoria"><option>Geral</option><option>Figurino</option><option>Maquiagem</option><option>Transporte</option><option>Alimentação</option><option>Show</option><option>Casa</option><option>Outro</option></select></div>
+      <div><label>Valor R$</label><input id="valorCompra" type="number" step="0.01" min="0" placeholder="0,00"></div>
+      <div><label>Forma de pagamento</label><select id="pagamento"><option>Dinheiro</option><option>Pix</option><option>Débito</option><option>Crédito</option><option>Boleto</option><option>Outro</option></select></div>
+    </div>
+    <label>Descrição manual / observação</label><textarea id="descricao" placeholder="Descreva detalhes da compra, nota fiscal, quantidade, local..."></textarea>
+    <div class="buttons">
+      <button onclick="adicionarGasto()">➕ Adicionar compra</button>
+      <button class="sec" onclick="usarDataHoje()">📅 Usar data de hoje</button>
+      <button class="warn" onclick="salvarHistorico()">💾 Salvar histórico</button>
+      <button class="sec" onclick="gerarPDF()">📄 Salvar em PDF</button>
+      <button class="danger" onclick="limparTudo()">🗑️ Limpar tudo</button>
+    </div>
+  </div>
+
+  <div class="tableBox">
+    <table id="tabela">
+      <thead>
+        <tr><th>Data</th><th>Comprado</th><th>Categoria</th><th>Descrição</th><th>Pagamento</th><th>Valor R$</th><th>Ação</th></tr>
+      </thead>
+      <tbody id="corpoTabela"></tbody>
+    </table>
+  </div>
+
+  <div class="history">
+    <h2>📌 Histórico de salvamento</h2>
+    <div id="historico"></div>
+  </div>
+  <div class="footer">Os dados ficam salvos neste navegador automaticamente.</div>
+</div>
+
+<script>
+let gastos = JSON.parse(localStorage.getItem('gastosMes')) || [];
+let historico = JSON.parse(localStorage.getItem('historicoGastosMes')) || [];
+const dinheiro = v => Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+function hojeISO(){ const d=new Date(); return d.toISOString().split('T')[0]; }
+function dataBR(iso){ if(!iso) return ''; const [a,m,d]=iso.split('-'); return `${d}/${m}/${a}`; }
+function atualizarRelogio(){
+  const agora = new Date();
+  document.getElementById('relogio').textContent = agora.toLocaleTimeString('pt-BR');
+  document.getElementById('dataHoje').textContent = agora.toLocaleDateString('pt-BR');
+}
+setInterval(atualizarRelogio,1000); atualizarRelogio();
+function usarDataHoje(){ document.getElementById('dataCompra').value = hojeISO(); }
+usarDataHoje();
+function salvarLocal(){ localStorage.setItem('gastosMes', JSON.stringify(gastos)); localStorage.setItem('historicoGastosMes', JSON.stringify(historico)); }
+function adicionarGasto(){
+  const data = document.getElementById('dataCompra').value || hojeISO();
+  const item = document.getElementById('itemCompra').value.trim();
+  const categoria = document.getElementById('categoria').value;
+  const valor = parseFloat(document.getElementById('valorCompra').value || 0);
+  const pagamento = document.getElementById('pagamento').value;
+  const descricao = document.getElementById('descricao').value.trim();
+  if(!item){ alert('Escreva o que foi comprado.'); return; }
+  gastos.push({data,item,categoria,descricao,pagamento,valor});
+  document.getElementById('itemCompra').value=''; document.getElementById('valorCompra').value=''; document.getElementById('descricao').value='';
+  salvarLocal(); renderizar();
+}
+function editar(i,campo,valor){ gastos[i][campo] = campo==='valor' ? parseFloat(valor || 0) : valor; salvarLocal(); renderizar(false); }
+function remover(i){ if(confirm('Remover esta compra?')){ gastos.splice(i,1); salvarLocal(); renderizar(); } }
+function renderizar(scroll=true){
+  const corpo = document.getElementById('corpoTabela'); corpo.innerHTML='';
+  gastos.forEach((g,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><input type="date" value="${g.data}" onchange="editar(${i},'data',this.value)"></td>
+    <td><input value="${g.item.replaceAll('"','&quot;')}" onchange="editar(${i},'item',this.value)"></td>
+    <td><input value="${g.categoria.replaceAll('"','&quot;')}" onchange="editar(${i},'categoria',this.value)"></td>
+    <td><textarea onchange="editar(${i},'descricao',this.value)">${g.descricao||''}</textarea></td>
+    <td><input value="${g.pagamento.replaceAll('"','&quot;')}" onchange="editar(${i},'pagamento',this.value)"></td>
+    <td><input type="number" step="0.01" value="${g.valor}" onchange="editar(${i},'valor',this.value)"></td>
+    <td><button class="remove" onclick="remover(${i})">Excluir</button></td>`;
+    corpo.appendChild(tr);
+  });
+  const total = gastos.reduce((s,g)=>s+Number(g.valor||0),0);
+  document.getElementById('totalMes').textContent = dinheiro(total);
+  document.getElementById('qtdCompras').textContent = gastos.length;
+  renderHistorico();
+}
+function salvarHistorico(){
+  const total = gastos.reduce((s,g)=>s+Number(g.valor||0),0);
+  historico.unshift({data:new Date().toLocaleString('pt-BR'), total, qtd:gastos.length, compras:[...gastos]});
+  salvarLocal(); renderHistorico(); alert('Histórico salvo com sucesso!');
+}
+function renderHistorico(){
+  const div=document.getElementById('historico'); div.innerHTML='';
+  if(historico.length===0){ div.innerHTML='<p style="text-align:center;color:#aaa">Nenhum histórico salvo ainda.</p>'; return; }
+  historico.forEach((h,idx)=>{
+    const el=document.createElement('div'); el.className='histItem';
+    el.innerHTML=`<b>Salvamento ${idx+1}</b><br>Data: ${h.data}<br>Compras: ${h.qtd}<br>Total salvo: <b>${dinheiro(h.total)}</b>`;
+    div.appendChild(el);
+  });
+}
+function gerarPDF(){ window.print(); }
+function limparTudo(){ if(confirm('Deseja apagar todos os gastos e histórico?')){ gastos=[]; historico=[]; salvarLocal(); renderizar(); } }
+renderizar();
+</script>
+</body>
+</html>
